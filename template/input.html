@@ -1,12 +1,44 @@
+
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Input Form</title>
-</head>
-<body>
-    <form action="/" method="post">
-        <textarea name="input_text" rows="10" cols="50"></textarea>
-        <input type="submit" value="Submit">
+  <head>
+    <title>Paragraph Input Form</title>
+    <style>
+      form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      label {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+      }
+      textarea {
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+      }
+      input[type="submit"] {
+        background-color: #4CAF50;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        border: none;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+      input[type="submit"]:hover {
+        background-color: #3e8e41;
+      }
+    </style>
+  </head>
+  <body>
+    <form>
+      <label for="paragraph">Enter your paragraph:</label><br>
+      <textarea id="paragraph" name="paragraph" rows="10" cols="50"></textarea><br>
+      <input type="submit" value="Submit">
     </form>
-</body>
+  </body>
 </html>
