@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
   <head>
@@ -28,14 +27,22 @@
         border: none;
         font-size: 1rem;
         cursor: pointer;
+        transition-duration: 0.4s;
       }
       input[type="submit"]:hover {
         background-color: #3e8e41;
       }
+      input[type="submit"]:active {
+        background-color: #3e8e41;
+        transform: translateY(2px);
+      }
+      textarea:focus {
+        outline-color: #4CAF50;
+      }
     </style>
   </head>
   <body>
-    <form>
+    <form action="/" method="POST">
       <label for="paragraph">Enter your paragraph:</label><br>
       <textarea id="paragraph" name="paragraph" rows="10" cols="50"></textarea><br>
       <input type="submit" value="Submit">
