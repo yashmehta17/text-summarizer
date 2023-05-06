@@ -9,8 +9,7 @@ from nltk.tokenize import word_tokenize, sent_tokenize, RegexpTokenizer
 from gensim import corpora
 from gensim.models import LsiModel
 from nltk.stem.porter import PorterStemmer
-nltk.download('stopwords')
-nltk.download('punkt')
+#nltk.download('punkt')
 #from nltk.cluster.util import cosine_distance
 #from torchmetrics.text.rouge import ROUGEScore
 # from transformers import pipeline
@@ -52,7 +51,8 @@ def frequency_based(input_text):
     words = word_tokenize(input_text)
     freqTable = dict()
     sentences = sent_tokenize(input_text)
-    stopwords = set(nltk.corpus.stopwords.words('english'))
+    #stopwords = set(nltk.corpus.stopwords.words('english'))
+    stopwords = set('ourselves', 'hers', 'between', 'yourself', 'but', 'again', 'there', 'about', 'once', 'during', 'out', 'very', 'having', 'with', 'they', 'own', 'an', 'be', 'some', 'for', 'do', 'its', 'yours', 'such', 'into', 'of', 'most', 'itself', 'other', 'off', 'is', 's', 'am', 'or', 'who', 'as', 'from', 'him', 'each', 'the', 'themselves', 'until', 'below', 'are', 'we', 'these', 'your', 'his', 'through', 'don', 'nor', 'me', 'were', 'her', 'more', 'himself', 'this', 'down', 'should', 'our', 'their', 'while', 'above', 'both', 'up', 'to', 'ours', 'had', 'she', 'all', 'no', 'when', 'at', 'any', 'before', 'them', 'same', 'and', 'been', 'have', 'in', 'will', 'on', 'does', 'yourselves', 'then', 'that', 'because', 'what', 'over', 'why', 'so', 'can', 'did', 'not', 'now', 'under', 'he', 'you', 'herself', 'has', 'just', 'where', 'too', 'only', 'myself', 'which', 'those', 'i', 'after', 'few', 'whom', 't', 'being', 'if', 'theirs', 'my', 'against', 'a', 'by', 'doing', 'it', 'how', 'further', 'was', 'here', 'than')
     for word in words:
         word = word.lower()
         if word in stopwords:
