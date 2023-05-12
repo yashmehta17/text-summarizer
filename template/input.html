@@ -1,51 +1,281 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Paragraph Input Form</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Summarizer</title>
     <style>
-      form {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+      /* Reset styles */
+  * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    /* Global styles */
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      
+    }
+    
+    h1 {
+      text-align: center;
+      padding: 1rem;
+      background-color: #2F80ED;
+      color: #fff;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    form label {
+      display: block;
+      margin-bottom: 0.5rem;
+      margin-top: 12px;
+    }
+    
+    form input[type="range"] {
+      width: 50%;
+      margin-bottom: 1rem;
+    }
+    
+    form button[type="submit"] {
+      display: block;
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      border-radius: 3px;
+      border: none;
+      background-color: #2F80ED;
+      color: #fff;
+      cursor: pointer;
+    }
+    
+    form button[type="submit"]:hover {
+      background-color: #1B5AAB;
+    }
+  
+    /* form button[type="button"] {
+      display: block;
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      border-radius: 3px;
+      border: none;
+      background-color: #2F80ED;
+      color: #fff;
+      cursor: pointer;
+    } */
+    
+    form button[type="button"]:hover {
+      background-color: #1B5AAB;
+    }
+  
+    .button-wrapper {
+    display: flex;
+    /* border: 1px solid #2F80ED;
+    border-radius: 3px; */
+    justify-content: center;
+  }
+  
+      .button-group {
+      display: inline-block;
+      /* gap: 1rem; */
+      justify-content: center;
+      border: 1px solid #2F80ED;
+      border-radius: 20px;
+      padding: 3px;
       }
-      label {
-        font-size: 1.2rem;
-        margin-bottom: 0.5rem;
+  
+      .button-group button {
+      padding: 0.5rem 1rem;
+      border: none;
+      /* background-color: #2F80ED; */
+      color: white;
+      font-size: 1rem;
+      border-radius: 20px;
+      cursor: pointer;
       }
-      textarea {
-        padding: 0.5rem;
-        border-radius: 0.25rem;
-        border: 1px solid #ccc;
-        font-size: 1rem;
-        margin-bottom: 1rem;
+    
+    .text-container {
+      margin-bottom: 1rem;
+    }
+    
+    textarea {
+      width: 100%;
+      height: 300px;
+      margin-top: 0.5rem;
+      padding: 1rem;
+      font-size: 1.2rem;
+      border-radius: 3px;
+      border: 2px solid #ccc;
+      resize: none;
+    }
+    
+    .switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle {
+         position: relative;
+         display: block;
+         width: 140px;
+         height: 40px;
+         padding: 3px;
+         margin: auto;
+         border-radius: 50px;
+         cursor: pointer;
       }
-      input[type="submit"] {
-        background-color: #4CAF50;
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 0.25rem;
-        border: none;
-        font-size: 1rem;
-        cursor: pointer;
-        transition-duration: 0.4s;
+      .toggle-input {
+         position: absolute;
+         top: 0;
+         left: 0;
+         opacity: 0;
       }
-      input[type="submit"]:hover {
-        background-color: #3e8e41;
+      .toggle-label {
+         position: relative;
+         display: block;
+         height: inherit;
+         font-size: 12px;
+         background: #2F80ED;
+         border-radius: inherit;
+         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12), inset 0 0 3px
+         rgba(0, 0, 0, 0.15);
       }
-      input[type="submit"]:active {
-        background-color: #3e8e41;
-        transform: translateY(2px);
+      .toggle-label:before,
+      .toggle-label:after {
+         position: absolute;
+         top: 50%;
+         color: black;
+         margin-top: -.5em;
+         line-height: 1;
       }
-      textarea:focus {
-        outline-color: #4CAF50;
+      .toggle-label:before {
+         content: attr(data-off);
+         right: 11px;
+         color: #fff;
+         text-shadow: 0 1px rgba(255, 255, 255, 0.5);
       }
+      .toggle-label:after {
+         content: attr(data-on);
+         left: 11px;
+         color: #fff;
+         text-shadow: 0 1px rgba(0, 0, 0, 0.2);
+         opacity: 0;
+      }
+      .toggle-input:checked~.toggle-label {
+         background: #2F80ED;
+      }
+      .toggle-input:checked~.toggle-label:before {
+         opacity: 0;
+      }
+      .toggle-input:checked~.toggle-label:after {
+         opacity: 1;
+      }
+      .toggle-handle {
+         position: absolute;
+         top: 4px;
+         left: 4px;
+         width: 38px;
+         height: 38px;
+         background: linear-gradient(to bottom, #FFFFFF 40%, #f0f0f0);
+         border-radius: 50%;
+      }
+      .toggle-handle:before {
+         position: absolute;
+         top: 50%;
+         left: 50%;
+         margin: -6px 0 0 -6px;
+         width: 16px;
+         height: 16px;
+      }
+      .toggle-input:checked~.toggle-handle {
+         left: 98px;
+         box-shadow: -1px 1px 5px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Transition*/
+      .toggle-label,
+      .toggle-handle {
+         transition: All 0.3s ease;
+         -webkit-transition: All 0.3s ease;
+         -moz-transition: All 0.3s ease;
+         -o-transition: All 0.3s ease;
+      }
+    input[type="range"] {
+      -webkit-appearance: none;
+      width:50%;
+      height: 2rem;
+      background-color: #2F80ED;
+      border-radius: 10px;
+      outline: none;
+      padding: 10px;
+      margin-bottom: 0.5rem;
+    }
+    
+    input[type="range"]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 0.5rem;
+      background-color: #fff;
+      border-radius: 3px;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 1.5rem;
+      width: 1.5rem;
+      border-radius: 50%;
+      background-color: #fff;
+      margin-top: -0.5rem;
+      cursor: pointer;
+    }
+  
+    input[type="range"]::-webkit-slider-thumb::before {
+      content: '';
+      height: 0.5rem;
+      width: 0.5rem;
+      border-radius: 50%;
+      background-color: #000;
+      position: absolute;
+      top: -0.25rem;
+      left: -0.25rem;
+    }
     </style>
   </head>
   <body>
-    <form action="/" method="POST">
-      <label for="paragraph">Enter your paragraph:</label><br>
-      <textarea id="paragraph" name="paragraph" rows="10" cols="50"></textarea><br>
-      <input type="submit" value="Submit">
-    </form>
+    <header>
+      <h1>Text Summarizer</h1>
+    </header>
+    <main>
+      <div class="container">
+        <form id="form" action="/" method="post">
+            <div class="button-wrapper">
+                <label class="toggle">
+                  <input class="toggle-input" type="checkbox" name ="toggle-input"/>
+                  <span class="toggle-label" data-off="Paragraph" data-on="Key Sentence"></span>
+                  <span class="toggle-handle"></span>
+               </label>
+            </div>
+          <div class="text-container">
+            <label for="input-text">Input Text:</label>
+            <textarea id="input-text" name="input-text" placeholder="Paste your text here" required></textarea>
+          </div>
+          <button type="submit">Summarize</button>
+        </form>
+      </div>
+    </main>
   </body>
 </html>

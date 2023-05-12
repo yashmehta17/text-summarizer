@@ -1,5 +1,9 @@
 from flask import Flask, request, render_template
+from fastai.text.all import *
+from blurr.text.data.all import *
+from blurr.text.modeling.all import *
 import math
+import pathlib
 #import pandas as pd
 import nltk
 import nltk.data
@@ -9,6 +13,8 @@ from nltk.tokenize import word_tokenize, sent_tokenize, RegexpTokenizer
 from gensim import corpora
 from gensim.models import LsiModel
 from nltk.stem.porter import PorterStemmer
+from pathlib import Path
+
 #nltk.download('punkt')
 #from nltk.cluster.util import cosine_distance
 #from torchmetrics.text.rouge import ROUGEScore
@@ -20,8 +26,13 @@ app = Flask(__name__, template_folder='template')
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        input_text = request.form['paragraph']
-        summarized_text = summarize_extracive(input_text)
+        input_text = request.form['input-text']
+        try:
+            summarization_text = request.form['toggle-input']
+            summarization_type="Extractive"
+        except Exception as e:
+            summarization_type="Abstractive"
+        summarized_text = summarize_extracive(input_text,summarization_type)
         return render_template('output.html', output_text=summarized_text)
     else:
         return render_template('input.html')
@@ -32,19 +43,26 @@ def index():
 #     summarized_text = summarizer(input_text, max_length=120, min_length=30, do_sample=False)
 #     return summarized_text[0]['summary_text']
 
-def summarize_extracive(input_text):
+def summarize_extracive(input_text,summarization_type):
+    if summarization_type=="Abstractive":
+        temp=pathlib.PosixPath
+        pathlib.PosixPath= pathlib.WindowsPath
+        #path= Path("./model/model.h5")
+        inf_learn = load_learner(fname="./model/model.h5")
+        summary=inf_learn.blurr_summarize(input_text)
+        return summary[0]['summary_texts']
     #sentences = sent_tokenize(input_text)
     #stopwords = set(nltk.corpus.stopwords.words('english'))
-    
-    sentenceValueFrequencyBased = frequency_based(input_text)
-    #sentenceValueTFIDF = dict()
-    sentenceValueTFIDF = tf_idf(input_text)
-    
-    sentenceValueLSA = lsa_method(input_text)
-    
-    extractive_sumammry = extractive_sumammry_generation(sentenceValueFrequencyBased, sentenceValueTFIDF, sentenceValueLSA, input_text)
-    
-    return extractive_sumammry
+    else:
+        sentenceValueFrequencyBased = frequency_based(input_text)
+        #sentenceValueTFIDF = dict()
+        sentenceValueTFIDF = tf_idf(input_text)
+        
+        sentenceValueLSA = lsa_method(input_text)
+        
+        extractive_sumammry = extractive_sumammry_generation(sentenceValueFrequencyBased, sentenceValueTFIDF, sentenceValueLSA, input_text)
+        
+        return extractive_sumammry
 
 
 def frequency_based(input_text):
@@ -52,7 +70,7 @@ def frequency_based(input_text):
     freqTable = dict()
     sentences = sent_tokenize(input_text)
     #stopwords = set(nltk.corpus.stopwords.words('english'))
-    stopwords = set('ourselves', 'hers', 'between', 'yourself', 'but', 'again', 'there', 'about', 'once', 'during', 'out', 'very', 'having', 'with', 'they', 'own', 'an', 'be', 'some', 'for', 'do', 'its', 'yours', 'such', 'into', 'of', 'most', 'itself', 'other', 'off', 'is', 's', 'am', 'or', 'who', 'as', 'from', 'him', 'each', 'the', 'themselves', 'until', 'below', 'are', 'we', 'these', 'your', 'his', 'through', 'don', 'nor', 'me', 'were', 'her', 'more', 'himself', 'this', 'down', 'should', 'our', 'their', 'while', 'above', 'both', 'up', 'to', 'ours', 'had', 'she', 'all', 'no', 'when', 'at', 'any', 'before', 'them', 'same', 'and', 'been', 'have', 'in', 'will', 'on', 'does', 'yourselves', 'then', 'that', 'because', 'what', 'over', 'why', 'so', 'can', 'did', 'not', 'now', 'under', 'he', 'you', 'herself', 'has', 'just', 'where', 'too', 'only', 'myself', 'which', 'those', 'i', 'after', 'few', 'whom', 't', 'being', 'if', 'theirs', 'my', 'against', 'a', 'by', 'doing', 'it', 'how', 'further', 'was', 'here', 'than')
+    stopwords = {'ourselves', 'hers', 'between', 'yourself', 'but', 'again', 'there', 'about', 'once', 'during', 'out', 'very', 'having', 'with', 'they', 'own', 'an', 'be', 'some', 'for', 'do', 'its', 'yours', 'such', 'into', 'of', 'most', 'itself', 'other', 'off', 'is', 's', 'am', 'or', 'who', 'as', 'from', 'him', 'each', 'the', 'themselves', 'until', 'below', 'are', 'we', 'these', 'your', 'his', 'through', 'don', 'nor', 'me', 'were', 'her', 'more', 'himself', 'this', 'down', 'should', 'our', 'their', 'while', 'above', 'both', 'up', 'to', 'ours', 'had', 'she', 'all', 'no', 'when', 'at', 'any', 'before', 'them', 'same', 'and', 'been', 'have', 'in', 'will', 'on', 'does', 'yourselves', 'then', 'that', 'because', 'what', 'over', 'why', 'so', 'can', 'did', 'not', 'now', 'under', 'he', 'you', 'herself', 'has', 'just', 'where', 'too', 'only', 'myself', 'which', 'those', 'i', 'after', 'few', 'whom', 't', 'being', 'if', 'theirs', 'my', 'against', 'a', 'by', 'doing', 'it', 'how', 'further', 'was', 'here', 'than'}
     for word in words:
         word = word.lower()
         if word in stopwords:
@@ -80,7 +98,7 @@ def tf_idf(input_text):
     frequency_matrix = {}
     #stopWords = stopwords
     ps = PorterStemmer()
-
+    stopwords = {'ourselves', 'hers', 'between', 'yourself', 'but', 'again', 'there', 'about', 'once', 'during', 'out', 'very', 'having', 'with', 'they', 'own', 'an', 'be', 'some', 'for', 'do', 'its', 'yours', 'such', 'into', 'of', 'most', 'itself', 'other', 'off', 'is', 's', 'am', 'or', 'who', 'as', 'from', 'him', 'each', 'the', 'themselves', 'until', 'below', 'are', 'we', 'these', 'your', 'his', 'through', 'don', 'nor', 'me', 'were', 'her', 'more', 'himself', 'this', 'down', 'should', 'our', 'their', 'while', 'above', 'both', 'up', 'to', 'ours', 'had', 'she', 'all', 'no', 'when', 'at', 'any', 'before', 'them', 'same', 'and', 'been', 'have', 'in', 'will', 'on', 'does', 'yourselves', 'then', 'that', 'because', 'what', 'over', 'why', 'so', 'can', 'did', 'not', 'now', 'under', 'he', 'you', 'herself', 'has', 'just', 'where', 'too', 'only', 'myself', 'which', 'those', 'i', 'after', 'few', 'whom', 't', 'being', 'if', 'theirs', 'my', 'against', 'a', 'by', 'doing', 'it', 'how', 'further', 'was', 'here', 'than'}
     for sent in sentences:
         freq_table = {}
         words = word_tokenize(sent)
@@ -182,7 +200,7 @@ def lsa_method(input_text):
     sentences = sent_tokenize(input_text)
     document_list = sentences
     titles.append(input_text[0:min(len(input_text),5)])
-    
+    stopwords = {'ourselves', 'hers', 'between', 'yourself', 'but', 'again', 'there', 'about', 'once', 'during', 'out', 'very', 'having', 'with', 'they', 'own', 'an', 'be', 'some', 'for', 'do', 'its', 'yours', 'such', 'into', 'of', 'most', 'itself', 'other', 'off', 'is', 's', 'am', 'or', 'who', 'as', 'from', 'him', 'each', 'the', 'themselves', 'until', 'below', 'are', 'we', 'these', 'your', 'his', 'through', 'don', 'nor', 'me', 'were', 'her', 'more', 'himself', 'this', 'down', 'should', 'our', 'their', 'while', 'above', 'both', 'up', 'to', 'ours', 'had', 'she', 'all', 'no', 'when', 'at', 'any', 'before', 'them', 'same', 'and', 'been', 'have', 'in', 'will', 'on', 'does', 'yourselves', 'then', 'that', 'because', 'what', 'over', 'why', 'so', 'can', 'did', 'not', 'now', 'under', 'he', 'you', 'herself', 'has', 'just', 'where', 'too', 'only', 'myself', 'which', 'those', 'i', 'after', 'few', 'whom', 't', 'being', 'if', 'theirs', 'my', 'against', 'a', 'by', 'doing', 'it', 'how', 'further', 'was', 'here', 'than'}
     #For stemming purpose we use PorterStemmer()
     #Stemming is the process of reducing inflection word to its root form, i.e., stripping the suffix.
     
@@ -214,7 +232,7 @@ def lsa_method(input_text):
       for sc in docv:
         isent = (i,abs(sc[1]))
         vecSort[sc[0]].append(isent)
-        
+
         
     sentenceValueLSA = dict()
     for i in vecSort[0]:
@@ -268,7 +286,7 @@ def extractive_sumammry_generation(sentenceValueFrequencyBased, sentenceValueTFI
     
     #r1LSA = np.array([rouge(summaryLSA, input_text)['rouge1_fmeasure']])
     #r2LSA = np.array([rouge(summaryLSA, input_text)['rouge2_fmeasure']])
-   # rLLSA = np.array([rouge(summaryLSA, input_text)['rougeL_fmeasure']])
+    #rLLSA = np.array([rouge(summaryLSA, input_text)['rougeL_fmeasure']])
     rLFB=1
     rLTF=1
     rLLSA=1
@@ -295,34 +313,18 @@ def extractive_sumammry_generation(sentenceValueFrequencyBased, sentenceValueTFI
 
 
 def selectTopSentencesFrequencyBased(k, sentenceValueFrequencyBasedSorted):
-  return sentenceValueFrequencyBasedSorted[:k]
+  return sentenceValueFrequencyBasedSorted[:4]
 
 def selectTopSentencesTFIDF(k, sentenceValueTFIDFSorted):
-  return sentenceValueTFIDFSorted[:k]
+  return sentenceValueTFIDFSorted[:4]
 
 def selectTopSentencesLSA(k, sentenceValueLSASorted):
-  return sentenceValueLSASorted[:k]
+  return sentenceValueLSASorted[:4]
     
 def selectTopSentencesWeights(k, hybridSentenceScoreWeightsSorted):
-  return hybridSentenceScoreWeightsSorted[:k]
+  return hybridSentenceScoreWeightsSorted[:4]
     
 
 if __name__ == '__main__':
     app.run()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
