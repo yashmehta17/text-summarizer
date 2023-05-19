@@ -253,7 +253,9 @@
       top: -0.25rem;
       left: -0.25rem;
     }
+
     </style>
+    
   </head>
   <body>
     <header>
@@ -273,9 +275,14 @@
             <label for="input-text">Input Text:</label>
             <textarea id="input-text" name="input-text" placeholder="Paste your text here" required></textarea>
           </div>
-          <button type="submit">Summarize</button>
+          <button type="submit" id="btn">Summarize</button>
         </form>
       </div>
     </main>
   </body>
+  <script>
+    document.getElementById('btn').addEventListener("click", function(){
+      this.innerHTML = "↻ Loading...";
+    });
+  </script>
 </html>
