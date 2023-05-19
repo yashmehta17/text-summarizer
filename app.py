@@ -14,6 +14,7 @@ from gensim import corpora
 from gensim.models import LsiModel
 from nltk.stem.porter import PorterStemmer
 from pathlib import Path
+import requests
 
 #nltk.download('punkt')
 #from nltk.cluster.util import cosine_distance
@@ -45,24 +46,28 @@ def index():
 
 def summarize_extracive(input_text,summarization_type):
     if summarization_type=="Abstractive":
+        
         temp=pathlib.PosixPath
         pathlib.PosixPath= pathlib.WindowsPath
         #path= Path("./model/model.h5")
-        inf_learn = load_learner(fname="./model/model.h5")
-        summary=inf_learn.blurr_summarize(input_text)
+        #inf_learn = load_learner(fname="./model/model.h5")
+        #summary=inf_learn.blurr_summarize(input_text)
+        summary = get_abstractive(input_text)
+        return summary
         return summary[0]['summary_texts']
     #sentences = sent_tokenize(input_text)
     #stopwords = set(nltk.corpus.stopwords.words('english'))
     else:
         sentenceValueFrequencyBased = frequency_based(input_text)
         #sentenceValueTFIDF = dict()
+        extractive_summary = get_extractive(input_text)
         sentenceValueTFIDF = tf_idf(input_text)
         
         sentenceValueLSA = lsa_method(input_text)
         
         extractive_sumammry = extractive_sumammry_generation(sentenceValueFrequencyBased, sentenceValueTFIDF, sentenceValueLSA, input_text)
-        
-        return extractive_sumammry
+        extractive_sumammry = list(extractive_sumammry)
+        return extractive_summary
 
 
 def frequency_based(input_text):
@@ -70,7 +75,7 @@ def frequency_based(input_text):
     freqTable = dict()
     sentences = sent_tokenize(input_text)
     #stopwords = set(nltk.corpus.stopwords.words('english'))
-    stopwords = {'ourselves', 'hers', 'between', 'yourself', 'but', 'again', 'there', 'about', 'once', 'during', 'out', 'very', 'having', 'with', 'they', 'own', 'an', 'be', 'some', 'for', 'do', 'its', 'yours', 'such', 'into', 'of', 'most', 'itself', 'other', 'off', 'is', 's', 'am', 'or', 'who', 'as', 'from', 'him', 'each', 'the', 'themselves', 'until', 'below', 'are', 'we', 'these', 'your', 'his', 'through', 'don', 'nor', 'me', 'were', 'her', 'more', 'himself', 'this', 'down', 'should', 'our', 'their', 'while', 'above', 'both', 'up', 'to', 'ours', 'had', 'she', 'all', 'no', 'when', 'at', 'any', 'before', 'them', 'same', 'and', 'been', 'have', 'in', 'will', 'on', 'does', 'yourselves', 'then', 'that', 'because', 'what', 'over', 'why', 'so', 'can', 'did', 'not', 'now', 'under', 'he', 'you', 'herself', 'has', 'just', 'where', 'too', 'only', 'myself', 'which', 'those', 'i', 'after', 'few', 'whom', 't', 'being', 'if', 'theirs', 'my', 'against', 'a', 'by', 'doing', 'it', 'how', 'further', 'was', 'here', 'than'}
+    stopwords = {'ourselves', 'hers', 'between', 'yourself', 'but', 'again', 'there', 'about', 'once', 'during', 'out', 'very', 'having', 'with', 'they', '(' , ')' ,'own', 'an', 'be', 'some', 'for', 'do', 'its', 'yours', 'such', 'into', 'of', 'most', 'itself', 'other', 'off', 'is', 's', 'am', 'or', 'who', 'as', 'from', 'him', 'each', 'the', 'themselves', 'until', 'below', 'are', 'we', 'these', 'your', 'his', 'through', 'don', 'nor', 'me', 'were', 'her', 'more', 'himself', 'this', 'down', 'should', 'our', 'their', 'while', 'above', 'both', 'up', 'to', 'ours', 'had', 'she', 'all', 'no', 'when', 'at', 'any', 'before', 'them', 'same', 'and', 'been', 'have', 'in', 'will', 'on', 'does', 'yourselves', 'then', 'that', 'because', 'what', 'over', 'why', 'so', 'can', 'did', 'not', 'now', 'under', 'he', 'you', 'herself', 'has', 'just', 'where', 'too', 'only', 'myself', 'which', 'those', 'i', 'after', 'few', 'whom', 't', 'being', 'if', 'theirs', 'my', 'against', 'a', 'by', 'doing', 'it', 'how', 'further', 'was', 'here', 'than'}
     for word in words:
         word = word.lower()
         if word in stopwords:
@@ -192,7 +197,22 @@ def tf_idf(input_text):
     
     return sentenceValueTFIDF
     
-    
+def get_extractive(input_text):
+    url = urll()
+    payload = {'lang': 'en',
+    'data': input_text,
+    'percnt': '50',
+    'sorder': 'no',
+    'mode': '1'}
+    files=[]
+    headers = {}
+    response = requests.request("POST", url, headers=headers, data=payload, files=files)
+    res = response.json()
+    result = res.get("result")
+    content = json.loads(result)
+    output = content.get("content")
+    return output
+
 def lsa_method(input_text):
     
     #Split the given text to list of sentences and indentify title.
@@ -240,6 +260,19 @@ def lsa_method(input_text):
       
     return sentenceValueLSA
 
+def get_abstractive(input_text):
+    url = urll()
+    payload = {'lang': 'en',
+    'data': input_text,
+    'percnt': '50',
+    'sorder': 'no',
+    'mode': '2'}
+    files=[]
+    headers = {}
+    response = requests.request("POST", url, headers=headers, data=payload, files=files)
+    res = response.json()
+    output = res.get("result")
+    return output
 
 def extractive_sumammry_generation(sentenceValueFrequencyBased, sentenceValueTFIDF, sentenceValueLSA, input_text):
     sentenceValueFrequencyBasedSorted = list(sorted(sentenceValueFrequencyBased.items(), key=lambda item: item[1], reverse = True))
@@ -311,7 +344,8 @@ def extractive_sumammry_generation(sentenceValueFrequencyBased, sentenceValueTFI
     
     return summaryWeights
 
-
+def urll():
+   return "https://www.paraphraser.io/frontend/summarizerBeta"
 def selectTopSentencesFrequencyBased(k, sentenceValueFrequencyBasedSorted):
   return sentenceValueFrequencyBasedSorted[:4]
 
